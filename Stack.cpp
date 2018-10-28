@@ -3,21 +3,24 @@
 #include <cstdio>
 #include <cmath>
 
-#define TESTING()									    \
-	do{													\
-	if(StackOK() != 0) printf("Something wrong!\n");	\
+#define TESTING()								\
+	do                                          \
+	{											\
+		int error = StackOK();					\
+		if(error != 0)                          \
+			StackDump(error);					\
 	}while(0)
 
-const int CANARY = 42;
-
 typedef double Mytype;
+
+const int CANARY = 42;
 
 enum ERRORS
 {
 	STACK_OVERFLOWED = 1,
-	CANARY_BROKED = 2,
+	CANARY_BROKED    = 2,
 	INCORRECT_VALUES = 3,
-	INCORRECT_HASH = 4,
+	INCORRECT_HASH   = 4,
 };
 
 class Stack
@@ -31,15 +34,15 @@ private:
 	int 		canary2;
 
 public:
-	Stack();
-	Stack(int init_size);
-	~Stack();
-	int ReSize();
+	Stack           ();
+	Stack           (int init_size);
+	~Stack          ();
+	int ReSize      ();
 	int StackPush	(Mytype value);
 	int StackPop	();
 	int StackOK		();
 	int StackHash   ();
-	int StackDump	();
+	void StackDump	(int error);
 	int StackClear	();
 	void StackPrint ();
 };
@@ -59,27 +62,32 @@ Stack::Stack(int init_size)
 Stack::~Stack()
 {
 	if(size != 0)
-		delete[] data;///null
+		delete[] data;
+	data = NULL;
 }
 
 int Stack::ReSize()
 {
+	TESTING();
+
 	this->size *= 2;
 	this->data = (Mytype *)realloc((Mytype *)this->data, (this->size + 2)*sizeof(Mytype));
 	*(this->data + this->size / 2 + 1) = 0;
 	*(this->data + this->size + 1) = canary2; 
+	this->hash = StackHash();
 
 	if(this->data != NULL)
 		return 0;
 	else
 		perror("Shit happened");                     ////////////////wtf?
+
+	//TESTING();
 	return 0;
 }
 
 int Stack::StackPush(Mytype value)
 {
 	TESTING();
-
 	if(!std::isfinite(value))
 		perror("Shit happened");					////////////////wtf?
 
@@ -88,14 +96,15 @@ int Stack::StackPush(Mytype value)
 
 	this->data[this->amount + 1] = value;
 	this->amount++;
-
 	this->hash = StackHash();
 
+	//TESTING();
 	return 0;
 }
 
 int Stack::StackPop()
 {
+	TESTING();
 	if(this->amount == 0)
 		perror("Stack is empty");                    ////////////////wtf?
 
@@ -104,7 +113,9 @@ int Stack::StackPop()
 
 	this->data[this->amount + 1] = 0;
 	this->amount--;
+	this->hash = StackHash();
 
+	//TESTING();
 	return 0;
 }
 
@@ -125,7 +136,7 @@ int Stack::StackOK()
 int Stack::StackHash()
 {
 	int sum = 0;
-	for(int i = 0; i < amount; ++i)
+	for(int i = 1; i < amount + 1; i++)
 	{
 		sum += *(char*)&data[i];
 
@@ -133,6 +144,24 @@ int Stack::StackHash()
 	sum ^= size;
 	sum &= amount;
 	return sum;
+}
+
+void Stack::StackDump(int error)
+{
+	std::cout << "Information:" << std::endl;
+	std::cout << "Size  =  " << size << std::endl;
+	std::cout << "Amount of elements  =  " << amount << std::endl  << std::endl;
+	std::cout << "Canary #1  =  " << canary1 << std::endl;
+	std::cout << "Canary #2  =  " << canary2 << std::endl;
+	std::cout << "Canary #3  =  " << this->data[0] << std::endl;
+	std::cout << "Canary #4  =  " << this->data[size + 1] << std::endl << std::endl;
+	std::cout << "Hash  =  " << this->hash << std::endl << std::endl;
+	for(int i = 0; i < size; i++)
+	{
+		std::cout << data + i + 1 << "  :  ";
+		std::cout << "data[" << i + 1 << "]  =  " << data[i + 1] << std::endl;
+	}
+	std::cout  << std::endl;
 }
 
 void Stack::StackPrint()
@@ -151,10 +180,8 @@ int main()
 	stackpoint->StackPush(13);
 	stackpoint->StackPop();
 	stackpoint->StackPush(12);
-	stackpoint->StackPush(11);
 	stackpoint->StackPrint();
 	stackpoint->ReSize();
 	stackpoint->StackPrint();
 	return 0;
 }
-

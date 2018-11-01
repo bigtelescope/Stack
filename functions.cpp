@@ -35,9 +35,11 @@ int Stack::ReSize(double resize)
 	if(resize >= 1)
 		size = (int)(size * resize);
 	if(resize < 1)
-		size = (int)(size / 2);
+		size = (int)(size * resize);
 	data = (Mytype *)realloc((Mytype *)data, (size + 2)*sizeof(Mytype));
-	*(data + size / 2 + 1) = 0;
+	for(int i = amount + 1; i < size + 1; i++)
+		data[i] = 0;
+	//*(data + size / 2 + 1) = 0;
 	*(data + size + 1) = canary2; 
 	hash = StackHash();
 
@@ -59,8 +61,8 @@ int Stack::StackPush(Mytype value)
 
 	if(size < (2 * amount))
 		ReSize(2);
-	if(size > (4 * amount))
-		ReSize(1/2);
+	else if(size > (4 * amount))
+		ReSize(0.25);
 
 	data[amount + 1] = value;
 	amount++;
@@ -76,8 +78,16 @@ int Stack::StackPop()
 	if(amount == 0)
 		return error = STACK_IS_EMPTY;
 
+	else if(size == 0)
+		return error = STACK_IS_TOO_SMALL; 
+
 	if(size == 0)
-		return error = STACK_IS_TOO_SMALL;             
+		return error = STACK_IS_EMPTY;
+
+	if(size < (2 * amount))
+		ReSize(2);
+	else if(size > (4 * amount))
+		ReSize(0.25);
 
 	data[amount + 1] = 0;
 	amount--;
@@ -110,7 +120,7 @@ int Stack::StackHash()
 	int sum = 0;
 	for(int i = 1; i < amount + 1; i++)
 	{
-		sum += *(char*)&data[i];
+		sum += (int)data[i];
 
 	}
 	sum ^= size;
@@ -133,7 +143,7 @@ void Stack::StackDump()
 		std::cout << data + i + 1 << "  :  ";
 		std::cout << "data[" << i + 1 << "]  =  " << data[i + 1] << std::endl;
 	}
-	std::cout << DESCRIPT[error -1];
+	std::cout << DESCRIPT[error -1] << std::endl << std::endl;
 	std::cout  << std::endl;
 }
 

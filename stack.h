@@ -60,7 +60,7 @@ public:
 	int ReSize      	(double resize);//< changed a size of an array of elements
 	int StackPush		(Mytype value); //< puts a <value> into a stack
 	int StackPop		();				//< pulls out the last element
-	int StackOK			();			//< checks a state of a stack
+	int StackOK		();				//< checks a state of a stack
 	int StackHash   	();				//< counts hash
 	void StackDump		();				//< beautiful analyse of an error 
 	int StackClear		();				//< clears an array

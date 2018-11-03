@@ -56,8 +56,6 @@ int Stack::StackPush(Mytype value)
 
 	if(size < (2 * amount))
 		ReSize(2);
-	else if(size > (4 * amount))
-		ReSize(0.25);
 
 	data[amount + 1] = value;
 	amount++;
@@ -76,9 +74,7 @@ int Stack::StackPop()
 	if(!size)
 		return error = STACK_IS_TOO_SMALL;
 
-	if(size < (2 * amount))
-		ReSize(2);
-	else if(size > (4 * amount))
+	if(size > (4 * amount))
 		ReSize(0.25);
 
 	data[amount + 1] = 0;
@@ -111,10 +107,7 @@ int Stack::StackHash()
 {
 	int sum = 0;
 	for(int i = 1; i < amount + 1; i++)
-	{
 		sum += (int)data[i];
-
-	}
 	sum ^= size;
 	sum &= amount;
 	return sum;

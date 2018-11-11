@@ -1,4 +1,4 @@
-#include <iostream>
+#include <iostream> 
 #include <cstdlib>
 #include <cstdio>
 #include <cmath>
@@ -40,7 +40,7 @@ int Stack::ReSize(double resize)
 	for(int i = amount + 1; i < size + 1; i++)
 		data[i] = 0;
 	*(data + size + 1) = canary2; 
-
+	
 	hash = StackHash();
 
 	TESTING();
@@ -68,21 +68,36 @@ int Stack::StackPush(Mytype value)
 int Stack::StackPop()
 {
 	TESTING();
-	if(!amount)
-		return error = STACK_IS_EMPTY; 
 
-	if(!size)
+	if(amount == 0)
+		return error = STACK_IS_EMPTY;
+
+	if(size == 0)
 		return error = STACK_IS_TOO_SMALL;
 
 	if(size > (4 * amount))
-		ReSize(0.25);
+		ReSize(0.5);
 
-	data[amount + 1] = 0;
+	data[amount] = 0;
 	amount--;
 	hash = StackHash();
 
 	TESTING();
 	return 0;
+}
+
+Mytype Stack::StackTop()
+{
+	TESTING();
+
+	if(amount == 0)
+		error = STACK_IS_EMPTY; 
+
+	if(!size)
+		error = STACK_IS_TOO_SMALL;
+
+	TESTING();
+	return data[amount];
 }
 
 int Stack::StackOK()
@@ -93,8 +108,10 @@ int Stack::StackOK()
 		return CANARY_BROKED;
 	if(*(data + size + 1) != CANARY || *(data) != CANARY)
 		return CANARY_BROKED;
-	if(size < 0 || amount < 0 || data == NULL)
+	if(size <= 0 || amount < 0 || data == NULL)
 		return INCORRECT_VALUES;
+	/*if(!size || !amount)
+		return STACK_IS_EMPTY;*/
 	if(hash != StackHash())
 		return INCORRECT_HASH;
 	return 0;
@@ -128,7 +145,8 @@ void Stack::StackDump()
 		std::cout << data + i + 1 << "  :  ";
 		std::cout << "data[" << i + 1 << "]  =  " << data[i + 1] << std::endl;
 	}
-	std::cout << DESCRIPT[error -1] << std::endl << std::endl;
+	std::cout  << std::endl;
+	std::cout << DESCRIPT[error - 1] << std::endl << std::endl;
 	std::cout  << std::endl;
 }
 

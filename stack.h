@@ -6,12 +6,16 @@
 /*! \brief Checks state of stack
 	This define checks a correctness of size of a stack, amount of elements and so on 
 	If there is an error in code, this error will be analysed by StackDump function*/
-#define TESTING()					\
-	do                                              \
-	{						\
-		error = StackOK();			\
-		if(error != 0)                          \
-			StackDump();			\
+#define TESTING()											\
+	do                                          			\
+	{	if(!error)											\
+		{													\
+			error = StackOK();								\
+			if(error != STACK_IS_OK)            			\
+				StackDump();								\
+		}													\
+		else 												\
+			std::cout << DESCRIPT[error] << std::endl;   	\
 	}while(0)
 
 /* MyType, you can change it on your own*/
@@ -33,6 +37,7 @@ static std::string DESCRIPT[] =
 
 enum ERRORS
 {
+	STACK_IS_OK 	 = 0,
 	STACK_OVERFLOWED = 1,
 	CANARY_BROKED    = 2,
 	INCORRECT_VALUES = 3,
@@ -60,7 +65,8 @@ public:
 	int ReSize      	(double resize);//< changed a size of an array of elements
 	int StackPush		(Mytype value); //< puts a <value> into a stack
 	int StackPop		();				//< pulls out the last element
-	int StackOK		();				//< checks a state of a stack
+	Mytype StackTop		();				//< returns the last element of a stack
+	int StackOK			();				//< checks a state of a stack
 	int StackHash   	();				//< counts hash
 	void StackDump		();				//< beautiful analyse of an error 
 	int StackClear		();				//< clears an array
